@@ -1,0 +1,81 @@
+body{
+  font-family:"Droid Serif",Georgia,"Times New Roman","PingFang SC","Hiragino Sans GB","WenQuanYi Micro Hei","Microsoft Yahei",serif; 
+}
+a{
+  color:#333;
+}
+a:hover{
+  color:#31c27c;
+}
+table#ips {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.song {
+  display: flex;
+  text-align: left;
+  line-height: 3.5rem;
+}
+
+.name {
+  width: 40%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.singer,
+.album,
+.interval,
+.music-title{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.singer,
+.album{
+  width: 25%;
+}
+.interval{
+  width: 10%;
+}
+.music-header{
+  color:#939393;
+}
+.music-menu{
+  display: flex;
+width: 128px;
+justify-content: space-between;
+margin: 10px;
+}
+.hidden {
+  display:none;
+}
+.play,.add,.dl{
+display:inline-block;
+height: 36px;
+width: 36px;
+background-image: url(https://y.gtimg.cn/mediastyle/yqq/img/icon_list_menu.png);
+}
+.add{
+background-position: 0 -80px;
+}
+.dl{
+background-position: 0 -120px;
+}
+.play:hover{
+background-position: -40px 0;
+cursor:  pointer;
+}
+.add:hover{
+background-position: -40px -80px;;
+cursor:  pointer;
+}
+.dl:hover{
+background-position: -40px -120px;;
+cursor:  pointer;
+}
+/*APlayer*/
+.aplayer-lrc-current{
+  color:#31c27c!important;
+}
