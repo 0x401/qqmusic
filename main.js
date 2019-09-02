@@ -82,15 +82,7 @@ $(function () {
       });
     }
   }
-  $("input#domain,select#county").on('keypress', function (e) {
-    if (e.which == 13) {
-      check();
-    }
-  });
   $("a#search").on('click', function () {
     check();
   });
-
-  $("input#domain").trigger("input");
-  $("a#search").trigger("click");
 });
