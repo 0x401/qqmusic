@@ -26,7 +26,7 @@
       </p>
     </div>
 
-    <div id="songs" class=" has-text-centered"><ul class="song music-header"><li class="name">歌曲</li><li class="singer">歌手</li><li class="album">专辑</li><li calss="interval">时长</li></ul></div>
+    <div id="songs" class=" has-text-centered"></div>
     <div id="aplayer"></div>
   </div>
   <script src='https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js'></script>

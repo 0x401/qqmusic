@@ -23,7 +23,8 @@ function file_get_contents_curl($url,$referer='')
 switch ($f) {
     case 'search':
         $keyword = urlencode( $_GET['keyword']);
-        $content = file_get_contents_curl("http://220.249.243.70/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.song&searchid=0&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=1&&n=5&g_tk=5381&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&w=$keyword");//c.y.qq.com
+        $papge =  $_GET['p'];
+        $content = file_get_contents_curl("http://220.249.243.70/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.song&searchid=0&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=$papge&&n=5&g_tk=5381&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0&w=$keyword");//c.y.qq.com
         echo $content;
         break;
 
@@ -43,6 +44,9 @@ switch ($f) {
         $data = json_encode(array('url'=>$url,'lrc'=>$lrc));
         echo  $data;
         break;
-
-
+    case 'suggest':
+        $keyword = $_GET['keyword'];
+        $content = file_get_contents_curl("https://c.y.qq.com/splcloud/fcgi-bin/smartbox_new.fcg?is_xml=0&key=$keyword&g_tk=5381&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0");
+        echo $content;
+        break;
 }
