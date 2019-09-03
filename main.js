@@ -5,7 +5,7 @@ $(function () {
     autoplay: true,
     fixed: true
   });
-  const menu = '<a href class="play">播放</a><a href>添加</a><a href>下载</a>';
+
   function get_music(song, autoplay = false) {
     let guid = parseInt(Math.random(9000000000, 9999999999) * 10000000000);
     $.get({
@@ -38,6 +38,14 @@ $(function () {
     }
     return t;
   }
+  function record(keyword) {
+    $.ajax({
+      url: "../record.php?service=music&tag=keyword&value=" + encodeURIComponent(keyword),
+      success: function (result) {
+        console.log(result);
+      }
+    });
+  }
   //工具栏
   $('#songs').on('mouseover', '.name', function () {
     $(this).children('.music-menu').removeClass('hidden');
@@ -59,30 +67,29 @@ $(function () {
     console.log('a');
   });
   //
-  function check() {
-    $('#songs').html('<ul class="song music-header"><li class="name">歌曲</li><li class="singer">歌手</li><li class="album">专辑</li><li calss="interval">时长</li></ul>');
-    let d = $('#keyword');
-    if (d.val() != "") {
-      $("a#search").addClass("is-loading");
-      $.get({
-        url: './data.php',
-        data: 's=' + encodeURIComponent(d.val()) + '&f=search',
-        success: function (result) {
-          console.log(result);
-          let list = JSON.parse(result).data.song.list;
-          list.forEach(el => {
-            let info = 'data-mid="' + el.mid + '" data-title="' + el.title + '" data-singer="' + el.singer[0].title + '" data-cover="https://y.gtimg.cn/music/photo_new/T002R300x300M000' + el.album.mid + '.jpg"';
-            let row = '<ul class="song" ' + info + '><li class="name"><a class="music-title" href="javascript:;">' + el.title + '</a><div class="music-menu hidden"><a href="javascript:;" title="立即播放" class="play" ' + info + '></a><a href="javascript:;" title="加入播放列表" class="add" ' + info + '></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">' + el.singer[0].title + '</li><li class="album"><span class="albummid" data-albummid="' + el.album.mid + '">' + el.album.title + '</span></li><li class="interval">' + sec_to_time(el.interval) + '</li></ul>'
-            $('#songs').html($('#songs').html() + row);
-          });
-          $("a#search").removeClass("is-loading");
-          get_music($('.song').eq(1), true);
+  function search(keyword) {
+    $("a#search").addClass("is-loading");
+    $.get({
+      url: './data.php',
+      data: 'keyword=' + encodeURIComponent(keyword) + '&f=search',
+      success: function (result) {
+        console.log(result);
+        record(keyword);
+        let list = JSON.parse(result).data.song.list;
+        list.forEach(el => {
+          let info = 'data-mid="' + el.mid + '" data-title="' + el.title + '" data-singer="' + el.singer[0].title + '" data-cover="https://y.gtimg.cn/music/photo_new/T002R300x300M000' + el.album.mid + '.jpg"';
+          let row = '<ul class="song" ' + info + '><li class="name"><a class="music-title" href="javascript:;">' + el.title + '</a><div class="music-menu hidden"><a href="javascript:;" title="立即播放" class="play" ' + info + '></a><a href="javascript:;" title="加入播放列表" class="add" ' + info + '></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">' + el.singer[0].title + '</li><li class="album"><span class="albummid" data-albummid="' + el.album.mid + '">' + el.album.title + '</span></li><li class="interval">' + sec_to_time(el.interval) + '</li></ul>'
+          $('#songs').html($('#songs').html() + row);
+        });
+        $("a#search").removeClass("is-loading");
+        get_music($('.song').eq(1), true);
 
-        }
-      });
-    }
+      }
+    });
+
   }
   $("a#search").on('click', function () {
-    check();
+    if ($('#keyword').val().trim() != '')
+      search($('#keyword').val());
   });
 });
