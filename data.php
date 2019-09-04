@@ -37,16 +37,24 @@ switch ($f) {
         $vkey = $matches[1][0];
         $url ="http://183.131.60.16/amobile.music.tc.qq.com/M500$mid.mp3?guid=$guid&vkey=$vkey&uin=0&fromtag=58";
 
-        $lrc = file_get_contents_curl("http://220.249.243.70/lyric/fcgi-bin/fcg_query_lyric_new.fcg?songmid=$mid&g_tk=5381","https://y.qq.com/portal/song/$mid.html");
-        $lrc = substr($lrc, 18, -1);
+        $lrc = file_get_contents_curl("http://220.249.243.70/lyric/fcgi-bin/fcg_query_lyric_new.fcg?songmid=$mid&g_tk=5381&format=json","https://y.qq.com/portal/song/$mid.html");
         $lrc = json_decode($lrc, true);
-        $lrc = base64_decode($lrc['lyric']);
+        if($lrc['code']==0){
+          $lrc = base64_decode($lrc['lyric']);
+        }else{
+          $lrc = false;
+        }
         $data = json_encode(array('url'=>$url,'lrc'=>$lrc));
         echo  $data;
         break;
     case 'suggest':
         $keyword = $_GET['keyword'];
         $content = file_get_contents_curl("https://c.y.qq.com/splcloud/fcgi-bin/smartbox_new.fcg?is_xml=0&key=$keyword&g_tk=5381&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0");
+        echo $content;
+        break;
+    case 'album':
+        $albummid =$_GET['albummid'];
+        $content = file_get_contents_curl("https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_detail_cp.fcg?albummid=$albummid&platform=mac&format=json&newsong=1");
         echo $content;
         break;
 }
