@@ -51,7 +51,7 @@ margin: 10px;
 .hidden {
   display:none;
 }
-.play,.add,.dl{
+#playall,.play,.add,.dl{
 display:inline-block;
 height: 36px;
 width: 36px;
@@ -63,7 +63,7 @@ background-position: 0 -80px;
 .dl{
 background-position: 0 -120px;
 }
-.play:hover{
+#playall,:hover.play:hover{
 background-position: -40px 0;
 cursor:  pointer;
 }

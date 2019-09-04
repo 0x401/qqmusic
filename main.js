@@ -5,7 +5,7 @@ $(function () {
     autoplay: true,
     fixed: true
   });
-  const music_header = '<ul class="song music-header"><li class="name">歌曲</li><li class="singer">歌手</li><li class="album">专辑</li><li calss="interval">时长</li></ul>';
+  const music_header = '<ul class="song music-header"><li class="name">歌曲<div class="music-menu hidden"><a href="javascript:;" title="播放当页" class="playall" id="playall"></a><a href="javascript:;" title="加入播放列表" class="add"></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">歌手</li><li class="album">专辑</li><li calss="interval">时长</li></ul>';
   let music_body;
   let keyword;
   let album_list;
@@ -25,12 +25,17 @@ $(function () {
           lrc: result.lrc ? result.lrc : '[00:00.00]' + song.data("title") + " - 暂无歌词"
           // theme: '#ebd0c2'
         }]);
-
         if (autoplay) {
           ap.play();
         }
       }
     });
+  }
+  function add_music_all(songList) {
+    for (i = 0; i < songList.length; i++) {
+      add_music(songList.eq(i));
+      setTimeout((function (song) { console.log('Add Song:' + song.data('title')) }(songList.eq(i))), 2000);
+    };
   }
   function sec_to_time(s) {
     let t = '';
@@ -65,6 +70,10 @@ $(function () {
     ap.list.clear();
     add_music($(this), true);
   });
+  $('#songs').on('click', '#playall', function () {
+    ap.list.clear();
+    add_music_all($('.music-list'), true);
+  });
   //添加
   $('#songs').on('click', '.add', function () {
     add_music($(this));
@@ -72,11 +81,12 @@ $(function () {
   //专辑
   $('#songs').on('click', '.albummid', function () {
     $("a#search").addClass("is-loading");
+    let albummid = $(this).data('albummid');
     $.get({
       url: './data.php',
-      data: 'albummid=' + $(this).data('albummid') + '&f=album',
+      data: 'albummid=' + albummid + '&f=album',
       success: function (result) {
-        console.log(result);
+        console.log('Tag:Album Click :' + albummid);
         album_list = JSON.parse(result).data.getSongInfo;
         album_total = album_list.length - 1;
         list_album(album_list);
@@ -94,14 +104,15 @@ $(function () {
       if (((page - 1) * 10 + i) < list.length) {
         let el = list[(page - 1) * 10 + i];
         let info = 'data-mid="' + el.mid + '" data-title="' + el.title + '" data-singer="' + el.singer[0].title + '" data-cover="https://y.gtimg.cn/music/photo_new/T002R300x300M000' + el.album.mid + '.jpg"';
-        let row = '<ul class="song" ' + info + '><li class="name"><a class="music-title" href="javascript:;">' + el.title + '</a><div class="music-menu hidden"><a href="javascript:;" title="立即播放" class="play" ' + info + '></a><a href="javascript:;" title="加入播放列表" class="add" ' + info + '></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">' + el.singer[0].title + '</li><li class="album"><a class="albummid" href="javascript:;" data-albummid="' + el.album.mid + '">' + el.album.title + '</a></li><li class="interval">' + sec_to_time(el.interval) + '</li></ul>'
+        let row = '<ul class="song music-list" ' + info + '><li class="name"><a class="music-title" href="javascript:;">' + el.title + '</a><div class="music-menu hidden"><a href="javascript:;" title="立即播放" class="play" ' + info + '></a><a href="javascript:;" title="加入播放列表" class="add" ' + info + '></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">' + el.singer[0].title + '</li><li class="album"><a class="albummid" href="javascript:;" data-albummid="' + el.album.mid + '">' + el.album.title + '</a></li><li class="interval">' + sec_to_time(el.interval) + '</li></ul>'
         music_body += row;
       }
     }
-    pagination(list.length,'album',page+1);
+    pagination(list.length, 'album', page + 1);
   }
   //分页
   function pagination(totalnum, tag, page = 1) {
+    if (totalnum < 10) return '';
     let pagenum = Math.ceil(totalnum / 10);
     if (pagenum > 10) pagenum = 10;
     let pages = '<nav class="pagination is-center" role="navigation" aria-label="pagination"><ul class="pagination-list">';
@@ -120,8 +131,8 @@ $(function () {
       url: './data.php',
       data: 'value=' + encodeURIComponent(value) + '&p=' + page + '&f=' + tag,
       success: function (result) {
-        console.log(result);
-        record(value);
+        console.log('Tag:' + tag + ' Page:' + page + ' Value:' + value);
+        //record(value);
         let list;
         let totalnum;
         if (tag == 'search') {
@@ -142,7 +153,7 @@ $(function () {
         let pages = pagination(totalnum, page, tag);
         $('#songs').html(music_header + music_body + pages);
         if (page == 1) {
-          add_music($('.song').eq(1), true);
+          add_music($('.song').eq(0), true);
         }
       }
     });
@@ -155,7 +166,7 @@ $(function () {
       url: './data.php',
       data: 'keyword=' + encodeURIComponent(value) + '&p=' + page + '&f=' + tag,
       success: function (result) {
-        console.log(result);
+        console.log('Tag:' + tag + ' Page:' + page + ' Value:' + value);
         record(value);
         let list;
         let totalnum;
@@ -170,14 +181,15 @@ $(function () {
         list.forEach(el => {
           if (tag == 'album') el = el.songInfo;
           let info = 'data-mid="' + el.mid + '" data-title="' + el.title + '" data-singer="' + el.singer[0].title + '" data-cover="https://y.gtimg.cn/music/photo_new/T002R300x300M000' + el.album.mid + '.jpg"';
-          let row = '<ul class="song" ' + info + '><li class="name"><a class="music-title" href="javascript:;">' + el.title + '</a><div class="music-menu hidden"><a href="javascript:;" title="立即播放" class="play" ' + info + '></a><a href="javascript:;" title="加入播放列表" class="add" ' + info + '></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">' + el.singer[0].title + '</li><li class="album"><a class="albummid" href="javascript:;" data-albummid="' + el.album.mid + '">' + el.album.title + '</a></li><li class="interval">' + sec_to_time(el.interval) + '</li></ul>'
+          let row = '<ul class="song music-list" ' + info + '><li class="name"><a class="music-title" href="javascript:;">' + el.title + '</a><div class="music-menu hidden"><a href="javascript:;" title="立即播放" class="play" ' + info + '></a><a href="javascript:;" title="加入播放列表" class="add" ' + info + '></a><a href="javascript:;" title="下载" class="dl"></a></div></li><li class="singer">' + el.singer[0].title + '</li><li class="album"><a class="albummid" href="javascript:;" data-albummid="' + el.album.mid + '">' + el.album.title + '</a></li><li class="interval">' + sec_to_time(el.interval) + '</li></ul>'
           music_body += row;
         });
         $("a#search").removeClass("is-loading");
         let pages = pagination(totalnum, tag, page);
         $('#songs').html(music_header + music_body + pages);
-        if (page == 1) {
-          add_music($('.song').eq(1), true);
+        console.log(ap.list.audios.length);
+        if (ap.list.audios.length == 0) {
+          add_music($('.music-list').eq(0), true);
         }
       }
     });
@@ -200,7 +212,7 @@ $(function () {
       }
     } else if (tag == 'album') {
       list_album(album_list, page);
-      let pages = pagination(album_total, 'album');
+      let pages = pagination(album_total, 'album', page);
       $('#songs').html(music_header + music_body + pages);
     }
   });
